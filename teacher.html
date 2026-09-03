@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>在 / 是 / 有 语法挑战 · 教师管理</title>
+  <style>
+    :root {
+      --accent: #c4714f;
+      --accent-dark: #a85d3d;
+      --bg: #faf9f7;
+      --bg-card: #ffffff;
+      --text-primary: #1a1a1a;
+      --text-secondary: #5a5a5a;
+      --text-muted: #888888;
+      --border: #e8e5e0;
+      --border-subtle: #f0ede8;
+      --success: #4a9b5e;
+      --danger: #c44d4d;
+      --gold: #d4a017;
+      --silver: #8f9299;
+      --bronze: #b0713b;
+      --shadow: rgba(0,0,0,0.06);
+      --font: -apple-system, 'SF Pro Text', 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    }
+    [data-theme="dark"] {
+      --bg: #1a1a1a;
+      --bg-card: #242424;
+      --text-primary: #e8e5e0;
+      --text-secondary: #b8b8b8;
+      --text-muted: #777777;
+      --border: #3a3a3a;
+      --border-subtle: #2a2a2a;
+      --shadow: rgba(0,0,0,0.2);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    header {
+      padding: 18px 20px 12px;
+      text-align: center;
+      border-bottom: 1px solid var(--border-subtle);
+      background: var(--bg-card);
+    }
+    h1 { margin: 0 0 4px; font-size: 22px; letter-spacing: 0.05em; }
+    .subtitle { font-size: 13px; color: var(--text-muted); }
+    main {
+      max-width: 860px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .hidden { display: none !important; }
+
+    /* 密码门 */
+    .gate {
+      max-width: 400px;
+      margin: 60px auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 32px 28px;
+      box-shadow: 0 2px 12px var(--shadow);
+      text-align: center;
+    }
+    .gate h2 { margin: 0 0 6px; font-size: 20px; }
+    .gate p { color: var(--text-secondary); font-size: 14px; margin: 0 0 20px; }
+    .gate input {
+      width: 100%;
+      font-size: 18px;
+      padding: 13px 16px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      outline: none;
+      text-align: center;
+      letter-spacing: 0.2em;
+      font-family: var(--font);
+      margin-bottom: 12px;
+    }
+    .gate input:focus { border-color: var(--accent); }
+    .gate button {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font);
+    }
+    .gate button:hover { background: var(--accent-dark); }
+    .gate-error { color: var(--danger); font-size: 13px; min-height: 20px; margin-top: 8px; }
+
+    /* 统计卡片 */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    @media (min-width: 560px) { .stats { grid-template-columns: repeat(4, 1fr); } }
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+    .stat-num { font-size: 28px; font-weight: 700; color: var(--accent); }
+    .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+    /* 工具栏 */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .toolbar .spacer { flex: 1; }
+    .btn {
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 14px;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn:hover { border-color: var(--accent); color: var(--accent); }
+    .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn.primary:hover { background: var(--accent-dark); color: #fff; }
+    .btn.danger { color: var(--danger); }
+    .btn.danger:hover { border-color: var(--danger); color: var(--danger); }
+    .auto-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+    .auto-label input { accent-color: var(--accent); }
+
+    /* 表格 */
+    .table-wrap {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px var(--shadow);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    thead th {
+      text-align: left;
+      padding: 12px 14px;
+      background: var(--border-subtle);
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    tbody td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      white-space: nowrap;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #fffbf8; }
+    [data-theme="dark"] tbody tr:hover { background: #2e2a26; }
+    .rank-cell { font-weight: 700; width: 52px; color: var(--text-muted); }
+    .rank-cell.r1 { color: var(--gold); }
+    .rank-cell.r2 { color: var(--silver); }
+    .rank-cell.r3 { color: var(--bronze); }
+    .name-cell { font-weight: 600; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+    .score-cell { font-weight: 700; color: var(--accent); }
+    .pct-bar {
+      width: 70px;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    .pct-fill { height: 100%; background: var(--accent); }
+    .time-cell { color: var(--text-muted); font-size: 13px; }
+    .empty {
+      padding: 40px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+    .status-bar {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 12px;
+      min-height: 18px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>在 / 是 / 有 <span style="font-weight:400;">语法挑战</span></h1>
+    <div class="subtitle">教师管理后台 · CAIS G7 中文非母语</div>
+  </header>
+
+  <main>
+    <!-- 密码门 -->
+    <div class="gate" id="gate">
+      <h2>🔐 教师登录</h2>
+      <p>请输入教师密码进入管理后台</p>
+      <input type="password" id="pwdInput" placeholder="教师密码" autocomplete="off">
+      <button id="unlockBtn">进入</button>
+      <div class="gate-error" id="gateError"></div>
+    </div>
+
+    <!-- 管理主界面 -->
+    <div id="admin" class="hidden">
+      <div class="stats">
+        <div class="stat-card"><div class="stat-num" id="statCount">0</div><div class="stat-label">参与人数</div></div>
+        <div class="stat-card"><div class="stat-num" id="statAvg">0</div><div class="stat-label">平均分 / 20</div></div>
+        <div class="stat-card"><div class="stat-num" id="statFull">0</div><div class="stat-label">满分人数</div></div>
+        <div class="stat-card"><div class="stat-num" id="statPass">0%</div><div class="stat-label">及格率（≥12 分）</div></div>
+      </div>
+
+      <div class="toolbar">
+        <button class="btn primary" onclick="exportCSV()">⬇ 导出成绩单 CSV</button>
+        <button class="btn" onclick="loadData(true)">刷新 ↻</button>
+        <label class="auto-label"><input type="checkbox" id="autoRefresh" checked> 每 15 秒自动刷新</label>
+        <span class="spacer"></span>
+        <button class="btn danger" onclick="confirmClear()">🗑 清空排行榜</button>
+      </div>
+
+      <div class="table-wrap" id="tableWrap"></div>
+      <div class="status-bar" id="statusBar"></div>
+    </div>
+  </main>
+
+  <script>
+    (function() {
+      function applyTheme() {
+        var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      }
+      applyTheme();
+      if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
+      }
+    })();
+
+    // ===== 配置 =====
+    var BIN_ID = '6a993cd2f5f4af5e2964b28f';
+    var MASTER_KEY = '$2a$10$gCzlohVNrum2FMbLA3xpseVAXYANIAStCauNlHwlF.MrbIx200I2O';
+    var API_BASE = 'https://api.jsonbin.io/v3/b/' + BIN_ID;
+    var TOTAL = 20;
+    var PASS_LINE = 12;
+    // 教师密码（可自行修改后重新发布）
+    var TEACHER_PASSWORD = 'cais2026';
+
+    var cachedEntries = [];
+
+    // ===== 密码门 =====
+    function tryUnlock() {
+      var v = document.getElementById('pwdInput').value;
+      if (v === TEACHER_PASSWORD) {
+        sessionStorage.setItem('cais_admin', '1');
+        document.getElementById('gate').classList.add('hidden');
+        document.getElementById('admin').classList.remove('hidden');
+        loadData();
+        startAutoRefresh();
+      } else {
+        document.getElementById('gateError').textContent = '密码错误，请重试';
+        document.getElementById('pwdInput').value = '';
+      }
+    }
+    document.getElementById('unlockBtn').addEventListener('click', tryUnlock);
+    document.getElementById('pwdInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') tryUnlock();
+    });
+    if (sessionStorage.getItem('cais_admin') === '1') {
+      document.getElementById('gate').classList.add('hidden');
+      document.getElementById('admin').classList.remove('hidden');
+      loadData();
+      startAutoRefresh();
+    }
+
+    // ===== 数据 =====
+    function sortEntries(entries) {
+      return entries.slice().sort(function(a, b) {
+        if (b.score !== a.score) return b.score - a.score;
+        return (a.at || 0) - (b.at || 0);
+      });
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, function(c) {
+        return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c];
+      });
+    }
+
+    function fmtTime(ts) {
+      if (!ts) return '—';
+      var d = new Date(ts);
+      var p = function(n) { return n < 10 ? '0' + n : n; };
+      return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+    }
+
+    function loadData(silent) {
+      fetch(API_BASE + '/latest', { headers: { 'X-Master-Key': MASTER_KEY } })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          var entries = (data && data.record && data.record.entries) || [];
+          cachedEntries = entries;
+          renderTable(entries);
+          renderStats(entries);
+          document.getElementById('statusBar').textContent = '最近更新：' + new Date().toLocaleTimeString('zh-CN');
+        })
+        .catch(function(err) {
+          document.getElementById('statusBar').textContent = '加载失败，请检查网络后重试';
+        });
+    }
+
+    function renderStats(entries) {
+      var n = entries.length;
+      document.getElementById('statCount').textContent = n;
+      if (n === 0) {
+        document.getElementById('statAvg').textContent = 0;
+        document.getElementById('statFull').textContent = 0;
+        document.getElementById('statPass').textContent = '0%';
+        return;
+      }
+      var sum = 0, full = 0, pass = 0;
+      for (var i = 0; i < n; i++) {
+        sum += entries[i].score;
+        if (entries[i].score >= TOTAL) full++;
+        if (entries[i].score >= PASS_LINE) pass++;
+      }
+      document.getElementById('statAvg').textContent = (sum / n).toFixed(1);
+      document.getElementById('statFull').textContent = full;
+      document.getElementById('statPass').textContent = Math.round(pass / n * 100) + '%';
+    }
+
+    function renderTable(entries) {
+      var wrap = document.getElementById('tableWrap');
+      if (!entries || entries.length === 0) {
+        wrap.innerHTML = '<div class="empty">还没有学生提交成绩。把学生链接发给学生开始挑战吧！</div>';
+        return;
+      }
+      var sorted = sortEntries(entries);
+      var html = '<table><thead><tr>' +
+        '<th>排名</th><th>姓名</th><th>分数</th><th>正确率</th><th>提交时间</th>' +
+        '</tr></thead><tbody>';
+      for (var i = 0; i < sorted.length; i++) {
+        var e = sorted[i];
+        var rank = i + 1;
+        var rc = '';
+        var rt = rank;
+        if (rank === 1) { rc = 'r1'; rt = '🥇'; }
+        else if (rank === 2) { rc = 'r2'; rt = '🥈'; }
+        else if (rank === 3) { rc = 'r3'; rt = '🥉'; }
+        var pct = Math.round(e.score / (e.total || TOTAL) * 100);
+        html += '<tr>';
+        html += '<td class="rank-cell ' + rc + '">' + rt + '</td>';
+        html += '<td class="name-cell" title="' + escapeHtml(e.name) + '">' + escapeHtml(e.name) + '</td>';
+        html += '<td class="score-cell">' + e.score + ' / ' + (e.total || TOTAL) + '</td>';
+        html += '<td><span class="pct-bar"><span class="pct-fill" style="width:' + pct + '%"></span></span>' + pct + '%</td>';
+        html += '<td class="time-cell">' + fmtTime(e.at) + '</td>';
+        html += '</tr>';
+      }
+      html += '</tbody></table>';
+      wrap.innerHTML = html;
+    }
+
+    function exportCSV() {
+      if (!cachedEntries || cachedEntries.length === 0) {
+        alert('还没有数据可导出');
+        return;
+      }
+      var sorted = sortEntries(cachedEntries);
+      var lines = ['\uFEFF排名,姓名,分数,总分,正确率,提交时间'];
+      for (var i = 0; i < sorted.length; i++) {
+        var e = sorted[i];
+        var pct = Math.round(e.score / (e.total || TOTAL) * 100) + '%';
+        var name = '"' + String(e.name).replace(/"/g, '""') + '"';
+        lines.push((i+1) + ',' + name + ',' + e.score + ',' + (e.total || TOTAL) + ',' + pct + ',' + fmtTime(e.at));
+      }
+      var csv = lines.join('\n');
+      var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      var d = new Date();
+      a.download = '在是有-成绩单-' + d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate() + '.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function confirmClear() {
+      if (!cachedEntries || cachedEntries.length === 0) {
+        alert('排行榜已经是空的');
+        return;
+      }
+      if (confirm('确定要清空排行榜吗？将删除全部 ' + cachedEntries.length + ' 条成绩，且无法恢复。')) {
+        doClear();
+      }
+    }
+
+    function doClear() {
+      fetch(API_BASE, {
+        method: 'PUT',
+        headers: { 'X-Master-Key': MASTER_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ entries: [] })
+      }).then(function(r) { return r.json(); }).then(function() {
+        cachedEntries = [];
+        renderTable([]);
+        renderStats([]);
+        document.getElementById('statusBar').textContent = '已清空排行榜';
+      }).catch(function() {
+        document.getElementById('statusBar').textContent = '清空失败，请重试';
+      });
+    }
+
+    // ===== 自动刷新 =====
+    var timer = null;
+    function startAutoRefresh() {
+      if (timer) return;
+      timer = setInterval(function() {
+        if (document.getElementById('autoRefresh').checked) loadData();
+      }, 15000);
+    }
+  </script>
+</body>
+</html>

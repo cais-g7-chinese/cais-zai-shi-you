@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>在 / 是 / 有 语法挑战 · 排行榜</title>
+  <style>
+    :root {
+      --accent: #c4714f;
+      --accent-light: #e8a882;
+      --accent-dark: #a85d3d;
+      --bg: #faf9f7;
+      --bg-card: #ffffff;
+      --text-primary: #1a1a1a;
+      --text-secondary: #5a5a5a;
+      --text-muted: #888888;
+      --border: #e8e5e0;
+      --border-subtle: #f0ede8;
+      --success: #4a9b5e;
+      --danger: #c44d4d;
+      --gold: #d4a017;
+      --silver: #8f9299;
+      --bronze: #b0713b;
+      --shadow: rgba(0,0,0,0.06);
+      --font: -apple-system, 'SF Pro Text', 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    }
+    [data-theme="dark"] {
+      --bg: #1a1a1a;
+      --bg-card: #242424;
+      --text-primary: #e8e5e0;
+      --text-secondary: #b8b8b8;
+      --text-muted: #777777;
+      --border: #3a3a3a;
+      --border-subtle: #2a2a2a;
+      --shadow: rgba(0,0,0,0.2);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 18px 20px 10px;
+      text-align: center;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    h1 {
+      margin: 0 0 4px;
+      font-size: 22px;
+      letter-spacing: 0.05em;
+    }
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    main {
+      flex: 1;
+      max-width: 720px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    .hidden { display: none !important; }
+
+    /* ===== 开始页 ===== */
+    .start-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 28px 24px;
+      box-shadow: 0 2px 12px var(--shadow);
+    }
+    .start-panel h2 {
+      margin: 0 0 6px;
+      font-size: 20px;
+      text-align: center;
+    }
+    .start-desc {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin: 0 0 20px;
+    }
+    .name-field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .name-field label {
+      font-size: 14px;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+    .name-field input {
+      font-size: 18px;
+      padding: 14px 16px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.2s ease;
+      font-family: var(--font);
+    }
+    .name-field input:focus {
+      border-color: var(--accent);
+    }
+    .name-error {
+      color: var(--danger);
+      font-size: 13px;
+      display: none;
+    }
+    .start-btn {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 16px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 54px;
+      transition: background 0.2s ease;
+    }
+    .start-btn:hover { background: var(--accent-dark); }
+
+    /* ===== 排行榜 ===== */
+    .board-section {
+      margin-top: 24px;
+    }
+    .board-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .board-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .refresh-btn {
+      font-size: 12px;
+      color: var(--accent);
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .refresh-btn:hover { border-color: var(--accent); }
+    .board-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .board-row {
+      display: flex;
+      align-items: center;
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 15px;
+    }
+    .board-row:last-child { border-bottom: none; }
+    .board-row.me {
+      background: #fff6ef;
+      font-weight: 700;
+    }
+    [data-theme="dark"] .board-row.me { background: #33261c; }
+    .rank {
+      width: 40px;
+      font-weight: 700;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+    .rank.top1 { color: var(--gold); }
+    .rank.top2 { color: var(--silver); }
+    .rank.top3 { color: var(--bronze); }
+    .board-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-right: 12px;
+    }
+    .board-score {
+      font-weight: 700;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    .board-empty {
+      padding: 24px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 14px;
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+    }
+    .board-status {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    /* ===== 答题页 ===== */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    .player-tag {
+      font-weight: 700;
+      color: var(--accent);
+      max-width: 140px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .progress-wrap { flex: 1; margin-right: 16px; }
+    .progress-bg {
+      height: 8px;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.35s ease;
+    }
+    .score-box { text-align: right; min-width: 80px; }
+    .score-box strong {
+      display: block;
+      font-size: 18px;
+      color: var(--accent);
+    }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 28px 24px;
+      box-shadow: 0 2px 12px var(--shadow);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .question-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+    .sentence {
+      font-size: 26px;
+      line-height: 1.7;
+      margin: 0 0 24px;
+      text-align: center;
+      letter-spacing: 0.02em;
+    }
+    .blank {
+      display: inline-block;
+      min-width: 56px;
+      padding: 2px 10px;
+      border-bottom: 3px solid var(--accent);
+      color: var(--accent);
+      font-weight: 700;
+      text-align: center;
+      margin: 0 2px;
+    }
+    .options {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .option-btn {
+      border: 2px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border-radius: 10px;
+      padding: 16px 18px;
+      font-size: 20px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.18s ease;
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+      font-family: var(--font);
+    }
+    .option-btn:hover:not(:disabled) {
+      border-color: var(--accent-light);
+      background: #fffbf8;
+    }
+    .option-btn:active:not(:disabled) { transform: scale(0.99); }
+    .option-btn:disabled { cursor: default; }
+    .option-btn.correct {
+      border-color: var(--success);
+      background: #f0faf2;
+      color: var(--success);
+    }
+    .option-btn.wrong {
+      border-color: var(--danger);
+      background: #fdf2f2;
+      color: var(--danger);
+    }
+    .option-letter {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--border-subtle);
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+    .option-btn.correct .option-letter { background: var(--success); color: #fff; }
+    .option-btn.wrong .option-letter { background: var(--danger); color: #fff; }
+    .feedback {
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+      display: none;
+      animation: fadeIn 0.25s ease;
+    }
+    .feedback.show { display: block; }
+    .feedback.correct {
+      background: #f0faf2;
+      border: 1px solid #c6e5ce;
+      color: #2c5f3a;
+    }
+    .feedback.wrong {
+      background: #fdf2f2;
+      border: 1px solid #f0c5c5;
+      color: #7a2f2f;
+    }
+    .feedback-title { font-weight: 700; margin-bottom: 6px; font-size: 15px; }
+    .feedback-text { font-size: 14px; line-height: 1.55; }
+    .next-btn {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 16px;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 52px;
+      transition: background 0.2s ease;
+      display: none;
+      font-family: var(--font);
+    }
+    .next-btn.show { display: block; }
+    .next-btn:hover { background: var(--accent-dark); }
+
+    /* ===== 结果页 ===== */
+    .summary { text-align: center; animation: fadeIn 0.4s ease; }
+    .summary-emoji { font-size: 52px; margin-bottom: 8px; }
+    .summary h2 { margin: 0 0 8px; font-size: 24px; }
+    .summary-score {
+      font-size: 42px;
+      color: var(--accent);
+      font-weight: 700;
+      margin: 12px 0;
+    }
+    .summary-message { color: var(--text-secondary); margin-bottom: 8px; }
+    .rank-badge {
+      display: inline-block;
+      background: #fff6ef;
+      border: 1px solid var(--accent-light);
+      color: var(--accent-dark);
+      border-radius: 20px;
+      padding: 6px 18px;
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    [data-theme="dark"] .rank-badge { background: #33261c; color: var(--accent-light); }
+    .submit-status {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      min-height: 20px;
+    }
+    .submit-status.ok { color: var(--success); }
+    .submit-status.err { color: var(--danger); }
+    .mistakes { text-align: left; margin-top: 20px; }
+    .mistakes h3 {
+      font-size: 15px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .mistake-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+    .mistake-sentence { font-size: 18px; margin-bottom: 6px; }
+    .mistake-note { font-size: 13px; color: var(--text-secondary); }
+    .restart-btn {
+      margin-top: 24px;
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 16px;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 52px;
+      font-family: var(--font);
+    }
+    .restart-btn:hover { background: var(--accent-dark); }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (min-width: 560px) {
+      .options { grid-template-columns: 1fr 1fr; }
+      .sentence { font-size: 30px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>在 / 是 / 有 <span style="font-weight:400;">语法挑战</span></h1>
+    <div class="subtitle">CAIS G7 中文非母语 · 20 题 · 全班排行榜</div>
+  </header>
+
+  <main>
+    <!-- 开始页 -->
+    <div id="startScreen">
+      <div class="start-panel">
+        <h2>🙋 输入你的名字开始</h2>
+        <p class="start-desc">答完 20 题后，你的分数会自动提交到全班排行榜</p>
+        <div class="name-field">
+          <label for="nameInput">你的名字</label>
+          <input type="text" id="nameInput" placeholder="例如：小明 / Amy" maxlength="20" autocomplete="off">
+          <div class="name-error" id="nameError">请输入名字（2–20 个字）</div>
+        </div>
+        <button class="start-btn" id="startBtn">开始挑战 →</button>
+      </div>
+
+      <div class="board-section">
+        <div class="board-head">
+          <div class="board-title">🏆 全班排行榜</div>
+          <button class="refresh-btn" id="refreshBtn" onclick="loadLeaderboard()">刷新 ↻</button>
+        </div>
+        <div id="boardListWrap"></div>
+        <div class="board-status" id="boardStatus"></div>
+      </div>
+    </div>
+
+    <!-- 答题页 -->
+    <div id="gameScreen" class="hidden">
+      <div class="top-bar">
+        <span class="player-tag" id="playerTag"></span>
+        <div class="progress-wrap">
+          <div class="progress-bg"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+        <div class="score-box">
+          <strong id="scoreText">0</strong>
+          <span>分</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="question-label" id="questionLabel">Question 1 / 20</div>
+        <div class="sentence" id="sentence"></div>
+        <div class="options" id="options"></div>
+        <div class="feedback" id="feedback">
+          <div class="feedback-title" id="feedbackTitle"></div>
+          <div class="feedback-text" id="feedbackText"></div>
+        </div>
+        <button class="next-btn" id="nextBtn" onclick="nextQuestion()">下一题 →</button>
+      </div>
+    </div>
+
+    <!-- 结果页 -->
+    <div id="resultScreen" class="hidden">
+      <div class="summary">
+        <div class="summary-emoji" id="summaryEmoji">🎉</div>
+        <h2 id="summaryTitle">挑战完成！</h2>
+        <div class="summary-score" id="summaryScore">0 / 20</div>
+        <div class="rank-badge hidden" id="rankBadge"></div>
+        <div class="summary-message" id="summaryMessage"></div>
+        <div class="submit-status" id="submitStatus">正在提交成绩…</div>
+        <div class="mistakes" id="mistakes"></div>
+        <button class="restart-btn" onclick="restartGame()">再玩一次</button>
+      </div>
+
+      <div class="board-section">
+        <div class="board-head">
+          <div class="board-title">🏆 全班排行榜</div>
+          <button class="refresh-btn" onclick="loadLeaderboard(true)">刷新 ↻</button>
+        </div>
+        <div id="resultBoardWrap"></div>
+        <div class="board-status" id="resultBoardStatus"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (function() {
+      function applyTheme() {
+        var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      }
+      applyTheme();
+      if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
+      }
+    })();
+
+    // ===== JSONBin 配置 =====
+    var BIN_ID = '6a993cd2f5f4af5e2964b28f';
+    var MASTER_KEY = '$2a$10$gCzlohVNrum2FMbLA3xpseVAXYANIAStCauNlHwlF.MrbIx200I2O';
+    var API_BASE = 'https://api.jsonbin.io/v3/b/' + BIN_ID;
+
+    var questions = [
+      { sentence: '我_____老师，不_____学生。', blanks: 2, options: ['有 / 有', '是 / 在', '是 / 是'], answer: 2, explanation: '「是」表示身份或等同关系：I am a teacher, not a student.' },
+      { sentence: '学校里_____一个很大的操场。', blanks: 1, options: ['有', '是', '在'], answer: 0, explanation: '「有」表示某地存在某物：There is a big playground at the school.' },
+      { sentence: '我的手机_____书包里。', blanks: 1, options: ['有', '是', '在'], answer: 2, explanation: '「在」表示位置：My phone is in the schoolbag.' },
+      { sentence: '这_____我的爸爸，他_____公司工作。', blanks: 2, options: ['有 / 有', '是 / 在', '是 / 有'], answer: 1, explanation: '「是」介绍身份；「在」表示工作地点。' },
+      { sentence: '桌子上_____三本书和一支笔。', blanks: 1, options: ['有', '是', '在'], answer: 0, explanation: '「有」表示存在：There are three books and a pen on the table.' },
+      { sentence: '现在是十点，他应该_____学校上课。', blanks: 1, options: ['有', '是', '在'], answer: 2, explanation: '「在」表示动作发生的地点：He should be at school having class.' },
+      { sentence: '她_____美国人。', blanks: 1, options: ['有', '是', '在'], answer: 1, explanation: '「是」说明身份或国籍：She is American.' },
+      { sentence: '我的房间里_____一张床。', blanks: 1, options: ['有', '是', '在'], answer: 0, explanation: '「有」表示某处有某物：There is a bed in my room.' },
+      { sentence: '妈妈_____厨房里做饭。', blanks: 1, options: ['有', '是', '在'], answer: 2, explanation: '「在」表示地点：Mom is cooking in the kitchen.' },
+      { sentence: '这_____什么？', blanks: 1, options: ['有', '是', '在'], answer: 1, explanation: '「是」用于确认身份：What is this?' },
+      { sentence: '图书馆里_____很多人。', blanks: 1, options: ['有', '是', '在'], answer: 0, explanation: '「有」表示存在：There are many people in the library.' },
+      { sentence: '我的家_____学校旁边。', blanks: 1, options: ['有', '是', '在'], answer: 2, explanation: '「在」表示位置：My home is next to the school.' },
+      { sentence: '他_____医生，_____医院工作。', blanks: 2, options: ['有 / 有', '是 / 在', '是 / 有'], answer: 1, explanation: '「是」说明职业；「在」说明工作地点。' },
+      { sentence: '公园里_____很多花和树。', blanks: 1, options: ['有', '是', '在'], answer: 0, explanation: '「有」表示存在：There are many flowers and trees in the park.' },
+      { sentence: '老师_____教室里。', blanks: 1, options: ['有', '是', '在'], answer: 2, explanation: '「在」表示所在位置：The teacher is in the classroom.' },
+      { sentence: '那_____我的狗。', blanks: 1, options: ['有', '是', '在'], answer: 1, explanation: '「是」表示身份：That is my dog.' },
+      { sentence: '中国_____很多大城市。', blanks: 1, options: ['有', '是', '在'], answer: 0, explanation: '「有」表示存在：China has many big cities.' },
+      { sentence: '今天_____星期三。', blanks: 1, options: ['有', '是', '在'], answer: 1, explanation: '「是」用于说明日期或时间：Today is Wednesday.' },
+      { sentence: '你的书_____哪里？', blanks: 1, options: ['有', '是', '在'], answer: 2, explanation: '「在」用于问地点：Where is your book?' },
+      { sentence: '我_____两个弟弟，他们_____家里。', blanks: 2, options: ['有 / 在', '是 / 在', '有 / 是'], answer: 0, explanation: '「有」表示拥有；「在」表示所在的地点。' }
+    ];
+
+    var current = 0;
+    var score = 0;
+    var mistakes = [];
+    var answered = false;
+    var playerName = '';
+
+    // ===== 排行榜数据 =====
+    function normName(n) { return (n || '').trim().toLowerCase(); }
+
+    function sortEntries(entries) {
+      return entries.slice().sort(function(a, b) {
+        if (b.score !== a.score) return b.score - a.score;
+        return (a.at || 0) - (b.at || 0);
+      });
+    }
+
+    function renderBoard(entries, wrapEl, highlightName) {
+      if (!entries || entries.length === 0) {
+        wrapEl.innerHTML = '<div class="board-empty">还没有人提交成绩，快来当第一名吧！</div>';
+        return;
+      }
+      var sorted = sortEntries(entries);
+      var hl = normName(highlightName);
+      var html = '<ul class="board-list">';
+      for (var i = 0; i < sorted.length; i++) {
+        var e = sorted[i];
+        var rank = i + 1;
+        var rankCls = '';
+        var rankText = rank;
+        if (rank === 1) { rankCls = 'top1'; rankText = '🥇'; }
+        else if (rank === 2) { rankCls = 'top2'; rankText = '🥈'; }
+        else if (rank === 3) { rankCls = 'top3'; rankText = '🥉'; }
+        var isMe = hl && normName(e.name) === hl;
+        html += '<li class="board-row' + (isMe ? ' me' : '') + '">';
+        html += '<span class="rank ' + rankCls + '">' + rankText + '</span>';
+        html += '<span class="board-name">' + escapeHtml(e.name) + (isMe ? '（我）' : '') + '</span>';
+        html += '<span class="board-score">' + e.score + ' / ' + (e.total || questions.length) + '</span>';
+        html += '</li>';
+      }
+      html += '</ul>';
+      wrapEl.innerHTML = html;
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, function(c) {
+        return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c];
+      });
+    }
+
+    function loadLeaderboard(highlightResult) {
+      var isResult = !!highlightResult;
+      var wrapEl = document.getElementById(isResult ? 'resultBoardWrap' : 'boardListWrap');
+      var statusEl = document.getElementById(isResult ? 'resultBoardStatus' : 'boardStatus');
+
+      fetch(API_BASE + '/latest', {
+        headers: { 'X-Master-Key': MASTER_KEY }
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var entries = (data && data.record && data.record.entries) || [];
+        renderBoard(entries, wrapEl, playerName);
+        statusEl.textContent = '共 ' + entries.length + ' 位同学参与';
+      })
+      .catch(function(err) {
+        wrapEl.innerHTML = '<div class="board-empty">排行榜加载失败，请检查网络后点「刷新」</div>';
+        statusEl.textContent = '';
+      });
+    }
+
+    function submitScore(name, finalScore) {
+      // 读取 -> 合并 -> 写回（保留每人最好成绩）
+      return fetch(API_BASE + '/latest', { headers: { 'X-Master-Key': MASTER_KEY } })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          var entries = (data && data.record && data.record.entries) || [];
+          var nl = normName(name);
+          var existing = null;
+          for (var i = 0; i < entries.length; i++) {
+            if (normName(entries[i].name) === nl) { existing = i; break; }
+          }
+          var newEntry = { name: name, score: finalScore, total: questions.length, at: Date.now() };
+          if (existing === null) {
+            entries.push(newEntry);
+          } else {
+            // 保留较高分
+            if (finalScore >= entries[existing].score) {
+              entries[existing] = newEntry;
+            }
+          }
+          var sorted = sortEntries(entries);
+
+          return fetch(API_BASE, {
+            method: 'PUT',
+            headers: { 'X-Master-Key': MASTER_KEY, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ entries: entries })
+          }).then(function(r) { return r.json(); }).then(function() {
+            return sorted;
+          });
+        });
+    }
+
+    // ===== 游戏逻辑 =====
+    function renderQuestion() {
+      answered = false;
+      var q = questions[current];
+      document.getElementById('questionLabel').textContent = 'Question ' + (current + 1) + ' / ' + questions.length;
+      document.getElementById('scoreText').textContent = score;
+      document.getElementById('progressFill').style.width = ((current / questions.length) * 100) + '%';
+
+      var parts = q.sentence.split('_____');
+      var html = '';
+      for (var i = 0; i < parts.length; i++) {
+        html += parts[i];
+        if (i < q.blanks) {
+          html += '<span class="blank" id="blank' + i + '">?</span>';
+        }
+      }
+      document.getElementById('sentence').innerHTML = html;
+
+      var optsDiv = document.getElementById('options');
+      optsDiv.innerHTML = '';
+      for (var i = 0; i < q.options.length; i++) {
+        var btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.setAttribute('data-index', i);
+        btn.innerHTML = '<span class="option-letter">' + String.fromCharCode(65 + i) + '</span>' + q.options[i];
+        btn.onclick = function() { selectOption(parseInt(this.getAttribute('data-index'))); };
+        optsDiv.appendChild(btn);
+      }
+
+      document.getElementById('feedback').className = 'feedback';
+      document.getElementById('nextBtn').className = 'next-btn';
+    }
+
+    function selectOption(index) {
+      if (answered) return;
+      answered = true;
+      var q = questions[current];
+      var isCorrect = index === q.answer;
+      var btns = document.querySelectorAll('.option-btn');
+      for (var i = 0; i < btns.length; i++) {
+        btns[i].disabled = true;
+        if (i === q.answer) btns[i].classList.add('correct');
+        else if (i === index && !isCorrect) btns[i].classList.add('wrong');
+      }
+
+      var answerText = q.options[q.answer];
+      var parts = q.sentence.split('_____');
+      var filled = '';
+      var aParts = answerText.split('/');
+      for (var i = 0; i < parts.length; i++) {
+        filled += parts[i];
+        if (i < q.blanks) {
+          filled += '<span class="blank" style="border-color:var(--success);color:var(--success);">' + aParts[i].trim() + '</span>';
+        }
+      }
+      document.getElementById('sentence').innerHTML = filled;
+
+      var fb = document.getElementById('feedback');
+      fb.className = 'feedback show ' + (isCorrect ? 'correct' : 'wrong');
+      document.getElementById('feedbackTitle').textContent = isCorrect ? '答对了！' : '再想想看';
+      document.getElementById('feedbackText').textContent = q.explanation;
+
+      if (isCorrect) {
+        score++;
+        document.getElementById('scoreText').textContent = score;
+      } else {
+        mistakes.push({ q: q, chosen: q.options[index] });
+      }
+
+      document.getElementById('nextBtn').className = 'next-btn show';
+      if (current === questions.length - 1) {
+        document.getElementById('nextBtn').textContent = '看结果 →';
+      } else {
+        document.getElementById('nextBtn').textContent = '下一题 →';
+      }
+    }
+
+    function nextQuestion() {
+      current++;
+      if (current >= questions.length) {
+        showResult();
+      } else {
+        renderQuestion();
+      }
+    }
+
+    function showResult() {
+      document.getElementById('gameScreen').classList.add('hidden');
+      document.getElementById('resultScreen').classList.remove('hidden');
+      document.getElementById('summaryScore').textContent = score + ' / ' + questions.length;
+
+      var pct = score / questions.length;
+      var emoji, title, msg;
+      if (pct === 1) { emoji = '🏆'; title = '完美全对！'; msg = '太棒了，你完全掌握了 在、是、有 的用法！'; }
+      else if (pct >= 0.8) { emoji = '🎉'; title = '表现出色！'; msg = '大部分都答对了，再多练习几题就能更稳固。'; }
+      else if (pct >= 0.6) { emoji = '👍'; title = '继续加油！'; msg = '已经有基础了，看看下面的错题，再复习一下规则。'; }
+      else { emoji = '📚'; title = '还需要练习'; msg = '别气馁，错题正是最好的学习机会，复习后再挑战一次！'; }
+      document.getElementById('summaryEmoji').textContent = emoji;
+      document.getElementById('summaryTitle').textContent = title;
+      document.getElementById('summaryMessage').textContent = msg;
+
+      var mDiv = document.getElementById('mistakes');
+      if (mistakes.length === 0) {
+        mDiv.innerHTML = '<h3>没有错题 🌟</h3>';
+      } else {
+        var html = '<h3>错题回顾（' + mistakes.length + ' 题）</h3>';
+        for (var i = 0; i < mistakes.length; i++) {
+          var m = mistakes[i];
+          var answerText = m.q.options[m.q.answer];
+          html += '<div class="mistake-item">';
+          html += '<div class="mistake-sentence">' + m.q.sentence.replace(/_____/g, '<span style="color:var(--success);font-weight:700;">' + answerText + '</span>') + '</div>';
+          html += '<div class="mistake-note">你选了：' + m.chosen + ' · ' + m.q.explanation + '</div>';
+          html += '</div>';
+        }
+        mDiv.innerHTML = html;
+      }
+
+      // 提交成绩
+      var statusEl = document.getElementById('submitStatus');
+      statusEl.className = 'submit-status';
+      statusEl.textContent = '正在提交成绩…';
+
+      submitScore(playerName, score).then(function(sorted) {
+        var rank = -1;
+        var nl = normName(playerName);
+        for (var i = 0; i < sorted.length; i++) {
+          if (normName(sorted[i].name) === nl) { rank = i + 1; break; }
+        }
+        if (rank > 0) {
+          var badge = document.getElementById('rankBadge');
+          badge.classList.remove('hidden');
+          badge.textContent = '🏅 你目前排第 ' + rank + ' 名';
+        }
+        statusEl.className = 'submit-status ok';
+        statusEl.textContent = '✓ 成绩已提交';
+        renderBoard(sorted, document.getElementById('resultBoardWrap'), playerName);
+        document.getElementById('resultBoardStatus').textContent = '共 ' + sorted.length + ' 位同学参与';
+      }).catch(function(err) {
+        statusEl.className = 'submit-status err';
+        statusEl.textContent = '成绩提交失败（网络问题），请点「刷新」重试';
+        loadLeaderboard(true);
+      });
+    }
+
+    function restartGame() {
+      current = 0;
+      score = 0;
+      mistakes = [];
+      document.getElementById('resultScreen').classList.add('hidden');
+      document.getElementById('gameScreen').classList.remove('hidden');
+      renderQuestion();
+    }
+
+    function startGame() {
+      var name = document.getElementById('nameInput').value.trim();
+      if (name.length < 2) {
+        document.getElementById('nameError').style.display = 'block';
+        return;
+      }
+      document.getElementById('nameError').style.display = 'none';
+      playerName = name;
+      document.getElementById('playerTag').textContent = '👤 ' + name;
+      document.getElementById('startScreen').classList.add('hidden');
+      document.getElementById('gameScreen').classList.remove('hidden');
+      current = 0;
+      score = 0;
+      mistakes = [];
+      renderQuestion();
+    }
+
+    // ===== 初始化 =====
+    document.getElementById('startBtn').addEventListener('click', startGame);
+    document.getElementById('nameInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') startGame();
+    });
+    loadLeaderboard();
+  </script>
+</body>
+</html>
